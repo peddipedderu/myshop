@@ -7,7 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404, redirect
-from django.db.models import Q, Avg, Count
+from django.db.models import Q, Avg, Count, F
 from decimal import Decimal
 from django.utils import timezone
 from shop.models import (
@@ -156,6 +156,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         new_arrival = params.get('new_arrival')
         condition = params.get('condition')
         in_stock = params.get('in_stock')
+        deals = params.get('deals')
 
         if category:
             cat = Category.objects.filter(slug=category).first()
@@ -183,6 +184,8 @@ class ProductViewSet(viewsets.ModelViewSet):
             qs = qs.filter(condition=condition)
         if in_stock:
             qs = qs.filter(stock__gt=0)
+        if deals:
+            qs = qs.filter(original_price__isnull=False, original_price__gt=F('price'))
 
         return qs
 

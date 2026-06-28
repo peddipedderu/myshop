@@ -5,7 +5,16 @@ from .models import Category, Product
 def product_list(request, category_slug=None):
     category = None
     if category_slug:
-        category = get_object_or_404(Category, slug=category_slug)
+        special_filters = ['deals', 'featured', 'new-arrivals', 'bestsellers']
+        if category_slug in special_filters:
+            class VirtualCategory:
+                def __init__(self, name, slug):
+                    self.name = name
+                    self.slug = slug
+                    self.parent = None
+            category = VirtualCategory(category_slug.replace('-', ' ').title(), category_slug)
+        else:
+            category = get_object_or_404(Category, slug=category_slug)
     return render(request, 'shop/product/list.html', {'category': category})
 
 

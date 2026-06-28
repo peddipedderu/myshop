@@ -857,7 +857,17 @@ async function loadCategoryProducts(page = 1) {
   grid.innerHTML = '<div style="text-align:center;padding:60px;color:var(--gray-400);grid-column:1/-1"><div class="spinner" style="margin:0 auto 16px"></div><p>Loading products...</p></div>';
 
   let url = `/products/?page=${page}&ordering=${currentSort}&page_size=20`;
-  if (CATEGORY_SLUG) url += `&category=${CATEGORY_SLUG}`;
+  if (CATEGORY_SLUG) {
+    const specialFilters = ['deals', 'featured', 'new-arrivals', 'bestsellers'];
+    if (specialFilters.includes(CATEGORY_SLUG)) {
+      if (CATEGORY_SLUG === 'deals') url += `&deals=true`;
+      else if (CATEGORY_SLUG === 'featured') url += `&featured=true`;
+      else if (CATEGORY_SLUG === 'new-arrivals') url += `&new_arrival=true`;
+      else if (CATEGORY_SLUG === 'bestsellers') url += `&bestseller=true`;
+    } else {
+      url += `&category=${CATEGORY_SLUG}`;
+    }
+  }
   if (currentMinPrice) url += `&min_price=${currentMinPrice}`;
   if (currentMaxPrice) url += `&max_price=${currentMaxPrice}`;
   if (inStock) url += `&in_stock=true`;
