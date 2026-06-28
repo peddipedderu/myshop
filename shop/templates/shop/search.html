@@ -1,0 +1,126 @@
+{% extends "shop/base.html" %}
+{% load static %}
+{% block title %}Search Results for "{{ query }}" - PinkCycle Shop{% endblock %}
+
+{% block content %}
+<div class="container" style="padding:40px 0 80px;">
+  <div class="breadcrumb">
+    <a href="/">Home</a><span>/</span><span>Search</span>
+  </div>
+  
+  <h1 style="font-family:'Outfit',sans-serif;font-size:26px;font-weight:800;margin-bottom:8px">
+    Search Results for <span style="color:var(--pink)">"{{ query }}"</span>
+  </h1>
+  <p style="font-size:14px;color:var(--gray-500);margin-bottom:32px;" id="searchStats">Searching for products...</p>
+
+  <div class="products-grid" id="searchResultsGrid">
+    <div style="text-align:center;padding:60px;color:var(--gray-400);grid-column:1/-1">
+      <div class="spinner" style="margin:0 auto 16px"></div>
+      <p>Searching catalog...</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const searchQuery = "{{ query }}";
+  const searchCategory = "{{ category }}";
+
+  async function performSearch() {
+    const grid = document.getElementById('searchResultsGrid');
+    const stats = document.getElementById('searchStats');
+    
+    let url = `/products/search/?q=${encodeURIComponent(searchQuery)}`;
+    if (searchCategory) {
+      url += `&category=${encodeURIComponent(searchCategory)}`;
+    }
+    
+    try {
+      const data = await apiGet(url);
+      const products = data.results || [];
+      const count = data.count || products.length;
+      
+      stats.textContent = `${count} product${count !== 1 ? 's' : ''} found matching your query`;
+      
+      if (!products.length) {
+        grid.innerHTML = `
+          <div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--gray-400)">
+            <i class="fas fa-search" style="font-size:48px;opacity:0.3;margin-bottom:16px;display:block"></i>
+            <p style="font-size:16px;font-weight:600">No products found matching "${searchQuery}"</p>
+            <p style="font-size:13px;margin-top:8px">Try checking your spelling or using more general keywords.</p>
+            <a href="/" class="btn btn-primary btn-sm" style="margin-top:20px">Browse Homepage</a>
+          </div>`;
+        return;
+      }
+      
+      grid.innerHTML = products.map(renderProductCard).join('');
+      
+    } catch(e) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--gray-400)">Failed to execute search. Please try again.</div>';
+    }
+  }
+
+  // Helper star renderer (copied from list/detail script context to ensure availability)
+  function renderStars(rating) {
+    const r = parseFloat(rating) || 0;
+    let stars = '';
+    for (let i = 1; i <= 5; i++) {
+      stars += `<i class="${i <= r ? 'fas' : i - 0.5 <= r ? 'fas fa-star-half-alt' : 'far'} fa-star"></i>`;
+    }
+    return stars;
+  }
+
+  function renderProductCard(p) {
+    const discount = p.discount_percentage || 0;
+    const inStock = p.in_stock !== false;
+    const imgSrc = p.image || 'https://via.placeholder.com/400x400/F3F4F6/9CA3AF?text=' + encodeURIComponent(p.name);
+    return `
+      <div class="product-card">
+        <a href="/shop/${p.id}/${p.slug}/">
+          <div class="product-image-wrap">
+            <img src="${imgSrc}" alt="${p.name}" loading="lazy"/>
+            <div class="product-badges">
+              ${discount > 0 ? `<span class="badge badge-sale">-${discount}%</span>` : ''}
+              ${p.is_new_arrival ? `<span class="badge badge-new">NEW</span>` : ''}
+              ${p.is_featured ? `<span class="badge badge-featured">⭐ Featured</span>` : ''}
+            </div>
+            <div class="product-actions-overlay">
+              <button class="overlay-btn" onclick="event.preventDefault();toggleWishlist(${p.id}, this)"><i class="far fa-heart"></i></button>
+            </div>
+          </div>
+        </a>
+        <div class="product-info">
+          <div class="product-category-label">${p.category_name || ''}</div>
+          <a href="/shop/${p.id}/${p.slug}/" style="text-decoration:none">
+            <h3 class="product-name">${p.name}</h3>
+          </a>
+          <div class="product-rating">
+            <div class="stars">${renderStars(p.average_rating)}</div>
+            <span class="rating-count">(${p.review_count || 0})</span>
+          </div>
+          <div class="product-price-wrap">
+            <span class="product-price">KES ${parseFloat(p.price).toLocaleString()}</span>
+            ${p.original_price ? `<span class="product-original-price">KES ${parseFloat(p.original_price).toLocaleString()}</span>` : ''}
+          </div>
+          <button class="add-to-cart-btn" onclick="handleAddToCart(${p.id}, this)" ${!inStock ? 'disabled' : ''}>
+            <i class="fas fa-${inStock ? 'cart-plus' : 'times-circle'}"></i>
+            ${inStock ? 'Add to Cart' : 'Out of Stock'}
+          </button>
+        </div>
+      </div>`;
+  }
+
+  async function handleAddToCart(productId, btn) {
+    const original = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+    await addToCart(productId);
+    btn.innerHTML = '<i class="fas fa-check"></i> Added!';
+    setTimeout(() => {
+      btn.innerHTML = original;
+      btn.disabled = false;
+    }, 2000);
+  }
+
+  document.addEventListener('DOMContentLoaded', performSearch);
+</script>
+{% endblock %}

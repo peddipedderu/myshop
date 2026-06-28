@@ -2,34 +2,965 @@
 {% load static %}
 
 {% block title %}
-  {% if category %}{{ category.name }}{% else %}Products{% endif %}
+  {% if category %}{{ category.name }} - PinkCycle Shop{% else %}Shop All Products - PinkCycle Kenya{% endif %}
+{% endblock %}
+
+{% block meta_description %}
+  {% if category %}Shop {{ category.name }} at PinkCycle - Best prices in Kenya with fast delivery nationwide.{% else %}PinkCycle Shop - Kenya's best online marketplace. Shop electronics, fashion, beauty, home and more.{% endif %}
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+  /* ─── HERO SECTION ─────────────────────────────────────────────────────── */
+  .hero {
+    position: relative;
+    background: var(--gradient-dark);
+    overflow: hidden;
+    margin-bottom: 0;
+  }
+  .hero-slides { position: relative; height: 480px; }
+  .hero-slide {
+    position: absolute; inset: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 80px;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    pointer-events: none;
+  }
+  .hero-slide.active { opacity: 1; pointer-events: all; }
+  .hero-slide-1 { background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 50%, #4C1D95 100%); }
+  .hero-slide-2 { background: linear-gradient(135deg, #1F1035 0%, #7B2D8B 50%, #E91E8C 100%); }
+  .hero-slide-3 { background: linear-gradient(135deg, #0C0A09 0%, #1C1917 50%, #292524 100%); }
+  .hero-bg-decoration {
+    position: absolute;
+    right: -100px; top: -100px;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(233,30,140,0.15) 0%, transparent 70%);
+  }
+  .hero-content { position: relative; z-index: 2; max-width: 520px; }
+  .hero-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(233,30,140,0.2);
+    border: 1px solid rgba(233,30,140,0.4);
+    color: #FF6BB5;
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .hero-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 52px;
+    font-weight: 900;
+    color: var(--white);
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .hero-title .highlight { background: var(--gradient-pink-soft); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero-desc {
+    font-size: 16px;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 28px;
+    line-height: 1.7;
+  }
+  .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .hero-btn {
+    padding: 14px 28px;
+    border-radius: var(--radius);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hero-btn-primary { background: var(--gradient-pink); color: white; box-shadow: var(--shadow-pink); }
+  .hero-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(233,30,140,0.4); }
+  .hero-btn-outline { background: transparent; color: white; border: 2px solid rgba(255,255,255,0.4); }
+  .hero-btn-outline:hover { background: rgba(255,255,255,0.1); border-color: white; }
+  .hero-stats {
+    display: flex;
+    gap: 24px;
+    margin-top: 36px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+  .hero-stat { color: white; }
+  .hero-stat-num { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 800; color: var(--pink-light); }
+  .hero-stat-label { font-size: 12px; color: rgba(255,255,255,0.5); }
+  .hero-image {
+    position: absolute;
+    right: 60px; bottom: 0;
+    height: 90%;
+    opacity: 0.15;
+    pointer-events: none;
+  }
+  .hero-dots {
+    position: absolute;
+    bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; gap: 8px;
+    z-index: 10;
+  }
+  .hero-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+  }
+  .hero-dot.active { background: var(--pink); width: 24px; border-radius: 4px; }
+  .hero-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 44px; height: 44px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: white;
+    font-size: 16px;
+    transition: var(--transition);
+    backdrop-filter: blur(4px);
+  }
+  .hero-nav:hover { background: var(--pink); border-color: var(--pink); }
+  .hero-nav.prev { left: 20px; }
+  .hero-nav.next { right: 20px; }
+
+  /* ─── PROMO BANNERS ────────────────────────────────────────────────────── */
+  .promo-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    padding: 24px 0;
+  }
+  .promo-card {
+    border-radius: var(--radius);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: var(--transition);
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .promo-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .promo-card.pink { background: linear-gradient(135deg, #FFF0F7 0%, #FFD6EC 100%); border-color: rgba(233,30,140,0.15); }
+  .promo-card.purple { background: linear-gradient(135deg, #F5F0FF 0%, #E8D8FF 100%); border-color: rgba(123,45,139,0.15); }
+  .promo-card.blue { background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); border-color: rgba(59,130,246,0.15); }
+  .promo-card.green { background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%); border-color: rgba(16,185,129,0.15); }
+  .promo-icon { font-size: 32px; flex-shrink: 0; }
+  .promo-text h4 { font-size: 14px; font-weight: 700; color: var(--gray-900); }
+  .promo-text p { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+
+  /* ─── SECTION WRAPPER ──────────────────────────────────────────────────── */
+  .section { padding: 32px 0; }
+
+  /* ─── CATEGORY PILLS ───────────────────────────────────────────────────── */
+  .category-pills {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    margin-bottom: 24px;
+  }
+  .category-pills::-webkit-scrollbar { display: none; }
+  .category-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 20px;
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 2px solid var(--gray-200);
+    cursor: pointer;
+    transition: var(--transition);
+    min-width: 80px;
+    text-align: center;
+    flex-shrink: 0;
+    color: var(--gray-700);
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .category-pill:hover, .category-pill.active {
+    border-color: var(--pink);
+    color: var(--pink);
+    background: var(--pink-pale);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+  .category-pill .icon { font-size: 26px; }
+
+  /* ─── FLASH SALE TIMER ─────────────────────────────────────────────────── */
+  .flash-sale-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, var(--danger) 0%, #B91C1C 100%);
+    border-radius: var(--radius);
+    color: white;
+  }
+  .flash-sale-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+  }
+  .flash-icon { animation: pulse 1s infinite; }
+  @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+  .countdown {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+    align-items: center;
+  }
+  .countdown-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .countdown-num {
+    background: rgba(0,0,0,0.3);
+    color: white;
+    font-family: 'Outfit', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    width: 44px; height: 44px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .countdown-label { font-size: 10px; margin-top: 3px; opacity: 0.8; }
+  .countdown-sep { font-size: 20px; font-weight: 700; margin-top: -10px; }
+
+  /* ─── PRODUCT TABS ─────────────────────────────────────────────────────── */
+  .product-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid var(--gray-200);
+    margin-bottom: 24px;
+  }
+  .product-tab {
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-500);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: var(--transition);
+  }
+  .product-tab.active { color: var(--pink); border-bottom-color: var(--pink); }
+  .product-tab:hover { color: var(--gray-900); }
+
+  /* ─── SHOP LAYOUT ──────────────────────────────────────────────────────── */
+  .shop-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .shop-sidebar {
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    position: sticky;
+    top: calc(var(--header-height) + 60px);
+  }
+  .sidebar-section {
+    padding: 20px;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .sidebar-section:last-child { border-bottom: none; }
+  .sidebar-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .sidebar-clear { font-size: 12px; color: var(--pink); cursor: pointer; font-weight: 600; }
+  .sidebar-cats { list-style: none; }
+  .sidebar-cat {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--gray-50);
+    cursor: pointer;
+    color: var(--gray-700);
+    font-size: 13px;
+    transition: var(--transition);
+  }
+  .sidebar-cat:hover, .sidebar-cat.active { color: var(--pink); }
+  .sidebar-cat .count {
+    background: var(--gray-100);
+    color: var(--gray-500);
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 20px;
+  }
+  .price-range { display: flex; gap: 8px; align-items: center; }
+  .price-input { width: 90px; padding: 8px; border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm); font-size: 13px; text-align: center; }
+  .price-separator { color: var(--gray-400); }
+  .range-slider { width: 100%; margin-top: 10px; accent-color: var(--pink); }
+  .brand-checkbox { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; cursor: pointer; font-size: 13px; color: var(--gray-700); }
+  .brand-checkbox input { accent-color: var(--pink); width: 16px; height: 16px; }
+  .rating-filter { display: flex; align-items: center; gap: 8px; padding: 6px 0; cursor: pointer; color: var(--gray-700); font-size: 13px; }
+  .rating-filter:hover { color: var(--pink); }
+  .stars-small { color: var(--warning); font-size: 12px; }
+  .apply-filter-btn { width: 100%; padding: 12px; background: var(--gradient-pink); color: white; border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; transition: var(--transition); margin-top: 16px; }
+  .apply-filter-btn:hover { opacity: 0.9; }
+
+  /* ─── SORT BAR ─────────────────────────────────────────────────────────── */
+  .sort-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    margin-bottom: 20px;
+  }
+  .results-count { font-size: 14px; color: var(--gray-600); }
+  .sort-right { display: flex; align-items: center; gap: 12px; }
+  .sort-select {
+    padding: 8px 12px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    cursor: pointer;
+    background: var(--white);
+    color: var(--gray-700);
+    outline: none;
+  }
+  .view-toggle { display: flex; gap: 4px; }
+  .view-btn {
+    width: 36px; height: 36px;
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--gray-500);
+    border: 1.5px solid var(--gray-200);
+    font-size: 14px;
+    transition: var(--transition);
+    background: var(--white);
+  }
+  .view-btn.active { background: var(--pink); color: white; border-color: var(--pink); }
+
+  /* ─── PAGINATION ───────────────────────────────────────────────────────── */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--gray-200);
+  }
+  .page-btn {
+    width: 40px; height: 40px;
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-700);
+    border: 1.5px solid var(--gray-200);
+    background: var(--white);
+    transition: var(--transition);
+  }
+  .page-btn:hover { border-color: var(--pink); color: var(--pink); }
+  .page-btn.active { background: var(--pink); color: white; border-color: var(--pink); }
+  .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ─── RESPONSIVE ───────────────────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .shop-layout { grid-template-columns: 1fr; }
+    .shop-sidebar { position: static; display: none; }
+    .shop-sidebar.mobile-open { display: block; }
+    .hero-slides { height: 340px; }
+    .hero-slide { padding: 0 24px; }
+    .hero-title { font-size: 34px; }
+    .promo-row { grid-template-columns: repeat(2, 1fr); }
+    .hero-stats { flex-wrap: wrap; gap: 16px; }
+  }
+  @media (max-width: 640px) {
+    .hero-slides { height: 280px; }
+    .hero-title { font-size: 26px; }
+    .hero-desc { font-size: 14px; }
+    .hero-stat-num { font-size: 18px; }
+    .promo-row { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .category-pills { gap: 8px; }
+    .category-pill { padding: 12px 14px; min-width: 64px; }
+    .category-pill .icon { font-size: 22px; }
+  }
+</style>
 {% endblock %}
 
 {% block content %}
-  <div id="sidebar">
-    <h3>Categories</h3>
-    <ul>
-      <li {% if not category %}class="selected"{% endif %}>
-        <a href="{% url "shop:product_list" %}">All</a>
-      </li>
-      {% for c in categories %}
-        <li {% if category.slug == c.slug %}class="selected"{% endif %}>
-          <a href="{{ c.get_absolute_url }}">{{ c.name }}</a>
-        </li>
-      {% endfor %}
-    </ul>
-  </div>
-  <div id="main" class="product-list">
-    <h1>{% if category %}{{ category.name }}{% else %}Products{% endif %}</h1>
-    {% for product in products %}
-      <div class="item">
-        <a href="{{ product.get_absolute_url }}">
-          <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static "img/no_image.png" %}{% endif %}">
-        </a>
-        <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
-        <br>
-        ${{ product.price }}
+<div class="container">
+
+{% if not category %}
+<!-- ─── HERO BANNER ─────────────────────────────────────────────────────────── -->
+<div class="hero">
+  <div class="hero-slides" id="heroSlides">
+    <div class="hero-slide hero-slide-1 active" id="slide-0">
+      <div class="hero-bg-decoration"></div>
+      <div class="hero-content">
+        <div class="hero-label">⚡ Flash Sale — Up to 40% Off</div>
+        <h1 class="hero-title">Shop <span class="highlight">Electronics</span> at Unbeatable Prices</h1>
+        <p class="hero-desc">Phones, laptops, TVs and more — all with fast delivery to your door across Kenya.</p>
+        <div class="hero-actions">
+          <a href="/shop/electronics/" class="hero-btn hero-btn-primary"><i class="fas fa-bolt"></i> Shop Electronics</a>
+          <a href="/shop/deals/" class="hero-btn hero-btn-outline">View All Deals</a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="hero-stat-num">71+</div><div class="hero-stat-label">Products</div></div>
+          <div class="hero-stat"><div class="hero-stat-num">46</div><div class="hero-stat-label">Categories</div></div>
+          <div class="hero-stat"><div class="hero-stat-num">29</div><div class="hero-stat-label">Brands</div></div>
+          <div class="hero-stat"><div class="hero-stat-num">24/7</div><div class="hero-stat-label">Support</div></div>
+        </div>
       </div>
-    {% endfor %}
+    </div>
+    <div class="hero-slide hero-slide-2" id="slide-1">
+      <div class="hero-bg-decoration"></div>
+      <div class="hero-content">
+        <div class="hero-label">🌸 Community Shop Special</div>
+        <h1 class="hero-title">Eco-Friendly <span class="highlight">Period Products</span></h1>
+        <p class="hero-desc">Sustainable, affordable menstrual products that are better for you and the planet.</p>
+        <div class="hero-actions">
+          <a href="/shop/community-shop/" class="hero-btn hero-btn-primary"><i class="fas fa-heart"></i> Shop Community</a>
+          <a href="/shop/menstrual-products/" class="hero-btn hero-btn-outline">Learn More</a>
+        </div>
+      </div>
+    </div>
+    <div class="hero-slide hero-slide-3" id="slide-2">
+      <div class="hero-bg-decoration"></div>
+      <div class="hero-content">
+        <div class="hero-label">👗 New Season Arrivals</div>
+        <h1 class="hero-title">Discover the Latest <span class="highlight">Fashion</span> Trends</h1>
+        <p class="hero-desc">From casual wear to formal attire — shop the latest styles for women and men.</p>
+        <div class="hero-actions">
+          <a href="/shop/fashion/" class="hero-btn hero-btn-primary"><i class="fas fa-tshirt"></i> Shop Fashion</a>
+          <a href="/shop/womens-fashion/" class="hero-btn hero-btn-outline">Women's Picks</a>
+        </div>
+      </div>
+    </div>
   </div>
+  <button class="hero-nav prev" onclick="changeSlide(-1)"><i class="fas fa-chevron-left"></i></button>
+  <button class="hero-nav next" onclick="changeSlide(1)"><i class="fas fa-chevron-right"></i></button>
+  <div class="hero-dots" id="heroDots">
+    <button class="hero-dot active" onclick="goToSlide(0)"></button>
+    <button class="hero-dot" onclick="goToSlide(1)"></button>
+    <button class="hero-dot" onclick="goToSlide(2)"></button>
+  </div>
+</div>
+
+<!-- ─── PROMO CARDS ───────────────────────────────────────────────────────── -->
+<div class="promo-row">
+  <div class="promo-card pink" onclick="window.location.href='/shop/'">
+    <div class="promo-icon">🚚</div>
+    <div class="promo-text">
+      <h4>Free Delivery</h4>
+      <p>On orders over KES 2,500 in Nairobi</p>
+    </div>
+  </div>
+  <div class="promo-card purple" onclick="window.location.href='/shop/'">
+    <div class="promo-icon">🔄</div>
+    <div class="promo-text">
+      <h4>Easy Returns</h4>
+      <p>7-day hassle-free return policy</p>
+    </div>
+  </div>
+  <div class="promo-card blue" onclick="window.location.href='/shop/'">
+    <div class="promo-icon">🔒</div>
+    <div class="promo-text">
+      <h4>Secure Payment</h4>
+      <p>M-Pesa, PayPal, Visa & Mastercard</p>
+    </div>
+  </div>
+  <div class="promo-card green" onclick="window.location.href='/shop/'">
+    <div class="promo-icon">💬</div>
+    <div class="promo-text">
+      <h4>24/7 Support</h4>
+      <p>WhatsApp & live chat support</p>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CATEGORIES PILLS ──────────────────────────────────────────────────── -->
+<section class="section">
+  <div class="section-header">
+    <div class="section-title">
+      <div class="section-title-line"></div>
+      Shop by <span class="accent">Category</span>
+    </div>
+    <a href="/shop/" class="view-all">All Categories <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <div class="category-pills" id="categoriesPills">
+    <a href="/shop/" class="category-pill active"><div class="icon">🛍️</div><span>All</span></a>
+    <a href="/shop/phones-tablets/" class="category-pill"><div class="icon">📱</div><span>Phones</span></a>
+    <a href="/shop/laptops-computers/" class="category-pill"><div class="icon">💻</div><span>Laptops</span></a>
+    <a href="/shop/tvs-audio/" class="category-pill"><div class="icon">📺</div><span>TVs</span></a>
+    <a href="/shop/womens-fashion/" class="category-pill"><div class="icon">👗</div><span>Women</span></a>
+    <a href="/shop/mens-fashion/" class="category-pill"><div class="icon">👔</div><span>Men</span></a>
+    <a href="/shop/shoes-sneakers/" class="category-pill"><div class="icon">👟</div><span>Shoes</span></a>
+    <a href="/shop/skincare/" class="category-pill"><div class="icon">✨</div><span>Skincare</span></a>
+    <a href="/shop/makeup/" class="category-pill"><div class="icon">💄</div><span>Makeup</span></a>
+    <a href="/shop/home-appliances/" class="category-pill"><div class="icon">🏠</div><span>Home</span></a>
+    <a href="/shop/kitchen-appliances/" class="category-pill"><div class="icon">🍳</div><span>Kitchen</span></a>
+    <a href="/shop/gaming/" class="category-pill"><div class="icon">🎮</div><span>Gaming</span></a>
+    <a href="/shop/sports-outdoors/" class="category-pill"><div class="icon">⚽</div><span>Sports</span></a>
+    <a href="/shop/baby-toys/" class="category-pill"><div class="icon">🧸</div><span>Baby</span></a>
+    <a href="/shop/community-shop/" class="category-pill"><div class="icon">🌸</div><span>Community</span></a>
+  </div>
+</section>
+
+<!-- ─── FLASH SALE / DEALS ─────────────────────────────────────────────────── -->
+<section class="section">
+  <div class="flash-sale-header">
+    <div class="flash-sale-label"><span class="flash-icon">⚡</span> Flash Sale</div>
+    <div style="font-size:13px;opacity:0.8">Ends in:</div>
+    <div class="countdown" id="countdown">
+      <div class="countdown-unit"><div class="countdown-num" id="cdHours">08</div><div class="countdown-label">HRS</div></div>
+      <div class="countdown-sep">:</div>
+      <div class="countdown-unit"><div class="countdown-num" id="cdMinutes">24</div><div class="countdown-label">MIN</div></div>
+      <div class="countdown-sep">:</div>
+      <div class="countdown-unit"><div class="countdown-num" id="cdSeconds">59</div><div class="countdown-label">SEC</div></div>
+    </div>
+  </div>
+  <div class="products-grid" id="dealsGrid">
+    <div style="text-align:center;padding:40px;color:var(--gray-400);grid-column:1/-1">
+      <div class="spinner" style="margin:0 auto 16px"></div>
+      <p>Loading deals...</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FEATURED PRODUCTS ─────────────────────────────────────────────────── -->
+<section class="section">
+  <div class="section-header">
+    <div class="section-title">
+      <div class="section-title-line"></div>
+      <i class="fas fa-star" style="color:var(--warning)"></i>
+      Featured <span class="accent">Products</span>
+    </div>
+    <a href="/shop/?featured=true" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <div class="products-grid" id="featuredGrid">
+    <div style="text-align:center;padding:40px;color:var(--gray-400);grid-column:1/-1">
+      <div class="spinner" style="margin:0 auto 16px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── BESTSELLERS ───────────────────────────────────────────────────────── -->
+<section class="section">
+  <div class="section-header">
+    <div class="section-title">
+      <div class="section-title-line"></div>
+      🔥 Bestsellers
+    </div>
+    <a href="/shop/?bestseller=true" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+  </div>
+
+  <!-- Tabs -->
+  <div class="product-tabs" id="bestsellerTabs">
+    <div class="product-tab active" onclick="filterBestsellerTab('all', this)">All</div>
+    <div class="product-tab" onclick="filterBestsellerTab('electronics', this)">Electronics</div>
+    <div class="product-tab" onclick="filterBestsellerTab('fashion', this)">Fashion</div>
+    <div class="product-tab" onclick="filterBestsellerTab('beauty-health', this)">Beauty</div>
+    <div class="product-tab" onclick="filterBestsellerTab('home-kitchen', this)">Home</div>
+  </div>
+  <div class="products-grid" id="bestsellerGrid">
+    <div style="text-align:center;padding:40px;color:var(--gray-400);grid-column:1/-1">
+      <div class="spinner" style="margin:0 auto 16px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── NEW ARRIVALS ───────────────────────────────────────────────────────── -->
+<section class="section">
+  <div class="section-header">
+    <div class="section-title">
+      <div class="section-title-line"></div>
+      🆕 New Arrivals
+    </div>
+    <a href="/shop/?new_arrival=true" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <div class="products-grid" id="newArrivalsGrid">
+    <div style="text-align:center;padding:40px;color:var(--gray-400);grid-column:1/-1">
+      <div class="spinner" style="margin:0 auto 16px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── COMMUNITY SHOP BANNER ─────────────────────────────────────────────── -->
+<section class="section">
+  <div style="background:var(--gradient-pink);border-radius:var(--radius-lg);padding:48px;display:flex;align-items:center;justify-content:space-between;gap:24px;overflow:hidden;position:relative;">
+    <div style="position:absolute;right:-80px;top:-80px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,0.08)"></div>
+    <div style="position:absolute;right:80px;bottom:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,0.05)"></div>
+    <div style="position:relative;z-index:1;color:white;max-width:480px;">
+      <div style="font-size:12px;font-weight:700;letter-spacing:2px;opacity:0.8;text-transform:uppercase;margin-bottom:10px">🌸 Pink Cycle Community Shop</div>
+      <h2 style="font-family:'Outfit',sans-serif;font-size:36px;font-weight:900;line-height:1.2;margin-bottom:16px">Eco-Friendly Products That Care For You</h2>
+      <p style="font-size:15px;opacity:0.85;line-height:1.7;margin-bottom:24px">Reusable period products, wellness kits, empowerment books — curated especially for women who choose sustainability and self-care.</p>
+      <a href="/shop/community-shop/" style="display:inline-flex;align-items:center;gap:8px;background:white;color:var(--pink);padding:14px 28px;border-radius:var(--radius);font-weight:700;font-size:15px;transition:var(--transition);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+        <i class="fas fa-heart"></i> Shop Community
+      </a>
+    </div>
+    <div style="font-size:120px;flex-shrink:0;position:relative;z-index:1;opacity:0.7">🌸</div>
+  </div>
+</section>
+
+{% else %}
+<!-- ─── CATEGORY PAGE ───────────────────────────────────────────────────────── -->
+<div class="breadcrumb">
+  <a href="/">Home</a><span>/</span>
+  {% if category.parent %}<a href="/shop/{{ category.parent.slug }}/">{{ category.parent.name }}</a><span>/</span>{% endif %}
+  <span>{{ category.name }}</span>
+</div>
+
+<div class="shop-layout">
+  <!-- Sidebar -->
+  <aside class="shop-sidebar" id="shopSidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">Categories</div>
+      <ul class="sidebar-cats" id="sidebarCats">
+        <li class="sidebar-cat active" onclick="filterByCategory(null)">
+          <span>All Products</span>
+          <span class="count" id="allCount">-</span>
+        </li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Price Range <span class="sidebar-clear" onclick="clearPrice()">Clear</span></div>
+      <div class="price-range">
+        <input type="number" class="price-input" id="minPrice" placeholder="Min" min="0"/>
+        <span class="price-separator">—</span>
+        <input type="number" class="price-input" id="maxPrice" placeholder="Max" max="1000000"/>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Rating</div>
+      <div class="rating-filter" onclick="filterByRating(4)">
+        <span class="stars-small">★★★★☆</span> 4+ Stars
+      </div>
+      <div class="rating-filter" onclick="filterByRating(3)">
+        <span class="stars-small">★★★☆☆</span> 3+ Stars
+      </div>
+      <div class="rating-filter" onclick="filterByRating(0)">
+        <span class="stars-small">☆☆☆☆☆</span> All Ratings
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Availability</div>
+      <label class="brand-checkbox">
+        <input type="checkbox" id="inStockFilter" onchange="loadCategoryProducts()"/>
+        In Stock Only
+      </label>
+    </div>
+    <div class="sidebar-section">
+      <button class="apply-filter-btn" onclick="loadCategoryProducts()"><i class="fas fa-filter"></i> Apply Filters</button>
+    </div>
+  </aside>
+
+  <!-- Products Area -->
+  <div class="shop-main">
+    <div class="sort-bar">
+      <div class="results-count" id="resultsCount">Loading products...</div>
+      <div class="sort-right">
+        <select class="sort-select" id="sortSelect" onchange="loadCategoryProducts()">
+          <option value="-created">Newest First</option>
+          <option value="price">Price: Low to High</option>
+          <option value="-price">Price: High to Low</option>
+          <option value="name">Name A-Z</option>
+        </select>
+        <div class="view-toggle">
+          <button class="view-btn active" id="gridViewBtn" onclick="setView('grid')"><i class="fas fa-th"></i></button>
+          <button class="view-btn" id="listViewBtn" onclick="setView('list')"><i class="fas fa-list"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="products-grid" id="categoryProductsGrid">
+      <div style="text-align:center;padding:60px;color:var(--gray-400);grid-column:1/-1">
+        <div class="spinner" style="margin:0 auto 16px"></div>
+        <p>Loading products...</p>
+      </div>
+    </div>
+    <div class="pagination" id="paginationArea"></div>
+  </div>
+</div>
+{% endif %}
+
+</div><!-- /.container -->
+
+<script>
+const CATEGORY_SLUG = "{{ category.slug|default:'' }}";
+const IS_HOME = !CATEGORY_SLUG;
+
+// ─── PRODUCT CARD RENDERER ────────────────────────────────────────────────────
+function formatPrice(p) { return 'KES ' + parseFloat(p).toLocaleString('en-KE'); }
+
+function renderStars(rating) {
+  const r = parseFloat(rating) || 0;
+  let stars = '';
+  for (let i = 1; i <= 5; i++) {
+    stars += `<i class="${i <= r ? 'fas' : i - 0.5 <= r ? 'fas fa-star-half-alt' : 'far'} fa-star"></i>`;
+  }
+  return stars;
+}
+
+function renderProductCard(p) {
+  const discount = p.discount_percentage || 0;
+  const inStock = p.in_stock !== false;
+  const imgSrc = p.image || 'https://via.placeholder.com/400x400/F3F4F6/9CA3AF?text=' + encodeURIComponent(p.name);
+  return `
+    <div class="product-card" data-product-id="${p.id}">
+      <a href="/shop/${p.id}/${p.slug}/">
+        <div class="product-image-wrap">
+          <img src="${imgSrc}" alt="${p.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x400/F3F4F6/9CA3AF?text=${encodeURIComponent(p.name)}'"/>
+          <div class="product-badges">
+            ${discount > 0 ? `<span class="badge badge-sale">-${discount}%</span>` : ''}
+            ${p.is_new_arrival ? `<span class="badge badge-new">NEW</span>` : ''}
+            ${p.is_featured ? `<span class="badge badge-featured">⭐ Featured</span>` : ''}
+            ${!inStock ? `<span class="badge badge-oos">Out of Stock</span>` : ''}
+          </div>
+          <div class="product-actions-overlay">
+            <button class="overlay-btn" onclick="event.preventDefault();toggleWishlist(${p.id}, this)" title="Add to Wishlist"><i class="far fa-heart"></i></button>
+            <a href="/shop/${p.id}/${p.slug}/" class="overlay-btn" title="Quick View"><i class="fas fa-eye"></i></a>
+          </div>
+        </div>
+      </a>
+      <div class="product-info">
+        <div class="product-category-label">${p.category_name || (p.category && p.category.name) || ''}</div>
+        <a href="/shop/${p.id}/${p.slug}/" style="text-decoration:none">
+          <h3 class="product-name">${p.name}</h3>
+        </a>
+        <div class="product-rating">
+          <div class="stars">${renderStars(p.average_rating)}</div>
+          <span class="rating-count">(${p.review_count || 0})</span>
+        </div>
+        <div class="product-price-wrap">
+          <span class="product-price">${formatPrice(p.price)}</span>
+          ${p.original_price ? `<span class="product-original-price">${formatPrice(p.original_price)}</span>` : ''}
+          ${discount > 0 ? `<span class="product-discount">-${discount}%</span>` : ''}
+        </div>
+        <button class="add-to-cart-btn" onclick="handleAddToCart(${p.id}, this)" ${!inStock ? 'disabled' : ''}>
+          <i class="fas fa-${inStock ? 'cart-plus' : 'times-circle'}"></i>
+          ${inStock ? 'Add to Cart' : 'Out of Stock'}
+        </button>
+      </div>
+    </div>`;
+}
+
+async function handleAddToCart(productId, btn) {
+  const original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+  await addToCart(productId);
+  btn.classList.add('added');
+  btn.innerHTML = '<i class="fas fa-check"></i> Added!';
+  setTimeout(() => {
+    btn.classList.remove('added');
+    btn.innerHTML = original;
+    btn.disabled = false;
+  }, 2000);
+}
+
+// ─── HOME PAGE LOADERS ─────────────────────────────────────────────────────────
+let allProducts = [];
+let bestsellerProducts = [];
+
+async function loadHomeProducts() {
+  // Load deals
+  const deals = await apiGet('/products/?page_size=8&ordering=price');
+  const dealProducts = deals.results ? deals.results.filter(p => p.original_price && parseFloat(p.original_price) > parseFloat(p.price)).slice(0,8) : [];
+  document.getElementById('dealsGrid').innerHTML = dealProducts.length
+    ? dealProducts.map(renderProductCard).join('')
+    : '<p style="grid-column:1/-1;text-align:center;color:var(--gray-400);padding:40px">No deals right now. Check back soon!</p>';
+
+  // Load featured
+  const featured = await apiGet('/products/featured/');
+  document.getElementById('featuredGrid').innerHTML = featured.length
+    ? featured.map(renderProductCard).join('')
+    : '<p style="grid-column:1/-1;text-align:center;color:var(--gray-400);padding:40px">No featured products.</p>';
+
+  // Load bestsellers
+  const bs = await apiGet('/products/bestsellers/');
+  bestsellerProducts = bs;
+  document.getElementById('bestsellerGrid').innerHTML = bs.length
+    ? bs.map(renderProductCard).join('')
+    : '<p style="grid-column:1/-1;text-align:center;color:var(--gray-400);padding:40px">No bestsellers yet.</p>';
+
+  // Load new arrivals
+  const newArr = await apiGet('/products/new_arrivals/');
+  document.getElementById('newArrivalsGrid').innerHTML = newArr.length
+    ? newArr.map(renderProductCard).join('')
+    : '<p style="grid-column:1/-1;text-align:center;color:var(--gray-400);padding:40px">No new arrivals yet.</p>';
+}
+
+async function filterBestsellerTab(category, tabEl) {
+  document.querySelectorAll('.product-tab').forEach(t => t.classList.remove('active'));
+  tabEl.classList.add('active');
+  document.getElementById('bestsellerGrid').innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray-400);grid-column:1/-1"><div class="spinner" style="margin:0 auto 16px"></div></div>';
+
+  let url = '/products/bestsellers/';
+  if (category && category !== 'all') url = `/products/?bestseller=true&category=${category}&page_size=12`;
+  const data = await apiGet(url);
+  const products = Array.isArray(data) ? data : (data.results || []);
+  document.getElementById('bestsellerGrid').innerHTML = products.length
+    ? products.map(renderProductCard).join('')
+    : '<p style="grid-column:1/-1;text-align:center;color:var(--gray-400);padding:40px">No products found.</p>';
+}
+
+// ─── CATEGORY PAGE LOADERS ─────────────────────────────────────────────────────
+let currentPage = 1;
+let currentSort = '-created';
+let currentMinPrice = '';
+let currentMaxPrice = '';
+let currentRating = 0;
+
+async function loadCategoryProducts(page = 1) {
+  currentPage = page;
+  currentSort = document.getElementById('sortSelect')?.value || '-created';
+  currentMinPrice = document.getElementById('minPrice')?.value || '';
+  currentMaxPrice = document.getElementById('maxPrice')?.value || '';
+  const inStock = document.getElementById('inStockFilter')?.checked;
+
+  const grid = document.getElementById('categoryProductsGrid');
+  grid.innerHTML = '<div style="text-align:center;padding:60px;color:var(--gray-400);grid-column:1/-1"><div class="spinner" style="margin:0 auto 16px"></div><p>Loading products...</p></div>';
+
+  let url = `/products/?page=${page}&ordering=${currentSort}&page_size=20`;
+  if (CATEGORY_SLUG) url += `&category=${CATEGORY_SLUG}`;
+  if (currentMinPrice) url += `&min_price=${currentMinPrice}`;
+  if (currentMaxPrice) url += `&max_price=${currentMaxPrice}`;
+  if (inStock) url += `&in_stock=true`;
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('featured')) url += '&featured=true';
+  if (params.get('bestseller')) url += '&bestseller=true';
+  if (params.get('new_arrival')) url += '&new_arrival=true';
+
+  try {
+    const data = await apiGet(url);
+    const products = data.results || [];
+    const count = data.count || products.length;
+
+    document.getElementById('resultsCount').textContent = `${count} product${count !== 1 ? 's' : ''} found`;
+
+    grid.innerHTML = products.length
+      ? products.map(renderProductCard).join('')
+      : '<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--gray-400)"><i class="fas fa-search" style="font-size:48px;opacity:0.3;margin-bottom:16px;display:block"></i><p style="font-size:16px">No products found. Try different filters.</p></div>';
+
+    // Render pagination
+    renderPagination(count, page, 20);
+  } catch(e) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--gray-400)">Failed to load products.</div>';
+  }
+}
+
+function renderPagination(total, current, pageSize) {
+  const totalPages = Math.ceil(total / pageSize);
+  if (totalPages <= 1) { document.getElementById('paginationArea').innerHTML = ''; return; }
+  let html = '';
+  html += `<button class="page-btn" onclick="loadCategoryProducts(${current-1})" ${current===1?'disabled':''}><i class="fas fa-chevron-left"></i></button>`;
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === 1 || i === totalPages || (i >= current-2 && i <= current+2)) {
+      html += `<button class="page-btn ${i===current?'active':''}" onclick="loadCategoryProducts(${i})">${i}</button>`;
+    } else if (i === current-3 || i === current+3) {
+      html += `<span style="padding:0 4px;color:var(--gray-400)">...</span>`;
+    }
+  }
+  html += `<button class="page-btn" onclick="loadCategoryProducts(${current+1})" ${current===totalPages?'disabled':''}><i class="fas fa-chevron-right"></i></button>`;
+  document.getElementById('paginationArea').innerHTML = html;
+}
+
+function setView(type) {
+  const grid = document.getElementById('categoryProductsGrid');
+  if (type === 'list') {
+    grid.style.gridTemplateColumns = '1fr';
+  } else {
+    grid.style.gridTemplateColumns = '';
+  }
+  document.getElementById('gridViewBtn').classList.toggle('active', type === 'grid');
+  document.getElementById('listViewBtn').classList.toggle('active', type === 'list');
+}
+
+function clearPrice() {
+  document.getElementById('minPrice').value = '';
+  document.getElementById('maxPrice').value = '';
+}
+function filterByRating(r) { currentRating = r; }
+function filterByCategory(slug) { }
+
+// ─── HERO SLIDER ──────────────────────────────────────────────────────────────
+let currentSlide = 0;
+const totalSlides = 3;
+let slideTimer;
+
+function goToSlide(n) {
+  document.getElementById(`slide-${currentSlide}`).classList.remove('active');
+  document.querySelectorAll('.hero-dot')[currentSlide].classList.remove('active');
+  currentSlide = (n + totalSlides) % totalSlides;
+  document.getElementById(`slide-${currentSlide}`).classList.add('active');
+  document.querySelectorAll('.hero-dot')[currentSlide].classList.add('active');
+}
+function changeSlide(dir) { goToSlide(currentSlide + dir); resetTimer(); }
+function resetTimer() { clearInterval(slideTimer); slideTimer = setInterval(() => goToSlide(currentSlide + 1), 5000); }
+
+// ─── COUNTDOWN TIMER ──────────────────────────────────────────────────────────
+function startCountdown() {
+  const el = document.getElementById('countdown');
+  if (!el) return;
+  const end = new Date();
+  end.setHours(end.getHours() + 8, end.getMinutes() + 24, end.getSeconds() + 59);
+  setInterval(() => {
+    const now = new Date();
+    const diff = Math.max(0, end - now);
+    const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
+    const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+    const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+    document.getElementById('cdHours').textContent = h;
+    document.getElementById('cdMinutes').textContent = m;
+    document.getElementById('cdSeconds').textContent = s;
+  }, 1000);
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  if (IS_HOME) {
+    loadHomeProducts();
+    resetTimer();
+    startCountdown();
+  } else {
+    loadCategoryProducts();
+  }
+});
+</script>
 {% endblock %}

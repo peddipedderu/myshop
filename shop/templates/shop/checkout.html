@@ -1,0 +1,718 @@
+{% extends "shop/base.html" %}
+{% load static %}
+{% block title %}Checkout - PinkCycle Shop{% endblock %}
+
+{% block extra_styles %}
+<style>
+  .checkout-wrapper { padding: 32px 0 60px; }
+  .checkout-layout { display: grid; grid-template-columns: 1fr 380px; gap: 32px; align-items: start; }
+  .checkout-panel {
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .panel-header {
+    padding: 20px 24px;
+    background: var(--gradient-dark);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: white;
+  }
+  .panel-num {
+    width: 28px; height: 28px;
+    background: var(--pink);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px;
+    flex-shrink: 0;
+  }
+  .panel-title { font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 700; }
+  .panel-body { padding: 24px; }
+
+  /* ─── ORDER SUMMARY ─── */
+  .order-summary { }
+  .order-item { display: flex; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--gray-100); }
+  .order-item:last-child { border-bottom: none; }
+  .order-item-img {
+    width: 64px; height: 64px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    background: var(--gray-100);
+    flex-shrink: 0;
+  }
+  .order-item-info { flex: 1; }
+  .order-item-name { font-size: 13px; font-weight: 600; color: var(--gray-900); }
+  .order-item-qty { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+  .order-item-price { font-size: 14px; font-weight: 700; color: var(--pink); margin-left: auto; flex-shrink: 0; }
+
+  .coupon-row { display: flex; gap: 8px; margin-top: 16px; margin-bottom: 20px; }
+  .coupon-input { flex: 1; padding: 10px 14px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); font-size: 13px; outline: none; }
+  .coupon-input:focus { border-color: var(--pink); }
+  .coupon-btn { padding: 10px 18px; background: var(--gradient-pink); color: white; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; }
+  .coupon-status { font-size: 12px; margin-top: 4px; }
+  .coupon-status.success { color: var(--success); }
+  .coupon-status.error { color: var(--danger); }
+
+  .price-breakdown { border-top: 2px solid var(--gray-200); padding-top: 16px; }
+  .price-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 14px; color: var(--gray-600); }
+  .price-row.total { font-size: 18px; font-weight: 800; color: var(--gray-900); border-top: 1px solid var(--gray-200); margin-top: 8px; padding-top: 12px; }
+  .price-row.total span:last-child { color: var(--pink); }
+  .discount-row { color: var(--success); }
+  .discount-row span:last-child { color: var(--success); font-weight: 600; }
+
+  /* ─── PAYMENT TABS ─── */
+  .payment-tabs { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+  .payment-tab {
+    flex: 1;
+    min-width: 120px;
+    padding: 14px 16px;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: center;
+    background: var(--white);
+  }
+  .payment-tab:hover { border-color: var(--pink); }
+  .payment-tab.active { border-color: var(--pink); background: var(--pink-pale); }
+  .payment-tab .payment-icon-lg { font-size: 24px; margin-bottom: 4px; }
+  .payment-tab .payment-name { font-size: 12px; font-weight: 700; color: var(--gray-700); }
+  .payment-tab.active .payment-name { color: var(--pink); }
+  .payment-panel { display: none; }
+  .payment-panel.active { display: block; }
+
+  /* ─── MPESA ─── */
+  .mpesa-form { }
+  .mpesa-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .mpesa-icon { width: 60px; height: 40px; background: #00A651; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 12px; }
+  .mpesa-hint { font-size: 13px; color: var(--gray-600); margin-bottom: 16px; padding: 12px 16px; background: rgba(0,166,81,0.08); border-radius: var(--radius-sm); border-left: 3px solid #00A651; }
+  .mpesa-status { margin-top: 16px; padding: 14px 16px; border-radius: var(--radius-sm); font-size: 14px; display: none; }
+  .mpesa-status.checking { background: rgba(59,130,246,0.1); color: var(--info); border: 1px solid rgba(59,130,246,0.2); }
+  .mpesa-status.success { background: rgba(16,185,129,0.1); color: var(--success); border: 1px solid rgba(16,185,129,0.2); }
+  .mpesa-status.error { background: rgba(239,68,68,0.1); color: var(--danger); border: 1px solid rgba(239,68,68,0.2); }
+
+  /* ─── STRIPE ─── */
+  .stripe-element-wrap { border: 2px solid var(--gray-200); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 16px; transition: var(--transition); }
+  .stripe-element-wrap:focus-within { border-color: var(--pink); }
+
+  /* ─── PAYPAL ─── */
+  .paypal-info { text-align: center; padding: 20px; }
+  .paypal-logo-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #FFC439; color: #003087;
+    padding: 14px 32px; border-radius: var(--radius);
+    font-size: 16px; font-weight: 700;
+    cursor: pointer; border: none;
+    transition: var(--transition);
+    margin-top: 16px;
+  }
+  .paypal-logo-btn:hover { background: #F5B92A; transform: translateY(-2px); }
+
+  /* ─── STEP INDICATOR ─── */
+  .step-indicator { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 32px; }
+  .step { display: flex; align-items: center; gap: 8px; }
+  .step-circle {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--gray-200);
+    color: var(--gray-500);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+    flex-shrink: 0;
+    transition: var(--transition);
+  }
+  .step-circle.done { background: var(--success); color: white; }
+  .step-circle.active { background: var(--gradient-pink); color: white; box-shadow: var(--shadow-pink); }
+  .step-label { font-size: 12px; font-weight: 600; color: var(--gray-400); }
+  .step-label.active { color: var(--pink); }
+  .step-label.done { color: var(--success); }
+  .step-line { width: 40px; height: 2px; background: var(--gray-200); margin: 0 8px; }
+  .step-line.done { background: var(--success); }
+
+  /* ─── SECURE BADGE ─── */
+  .secure-badge { display: flex; align-items: center; gap: 8px; background: rgba(16,185,129,0.08); padding: 10px 14px; border-radius: var(--radius-sm); margin-top: 16px; font-size: 12px; color: var(--success); border: 1px solid rgba(16,185,129,0.2); }
+
+  /* ─── SUCCESS STATE ─── */
+  .success-screen { display: none; text-align: center; padding: 60px 40px; }
+  .success-icon { font-size: 80px; margin-bottom: 20px; }
+  .success-title { font-family: 'Outfit', sans-serif; font-size: 32px; font-weight: 800; color: var(--success); margin-bottom: 12px; }
+  .success-desc { font-size: 16px; color: var(--gray-600); line-height: 1.7; }
+
+  @media (max-width: 900px) {
+    .checkout-layout { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    .payment-tabs { flex-direction: row; flex-wrap: wrap; }
+    .payment-tab { min-width: 80px; }
+  }
+</style>
+
+<!-- Stripe -->
+<script src="https://js.stripe.com/v3/"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container checkout-wrapper">
+  <div class="breadcrumb">
+    <a href="/">Home</a><span>/</span><a href="/cart">Cart</a><span>/</span><span>Checkout</span>
+  </div>
+  <h1 style="font-family:'Outfit',sans-serif;font-size:28px;font-weight:800;margin-bottom:24px">Secure Checkout</h1>
+
+  <!-- Step Indicator -->
+  <div class="step-indicator" id="stepIndicator">
+    <div class="step">
+      <div class="step-circle active" id="step1">1</div>
+      <div class="step-label active" id="stepLabel1">Shipping</div>
+    </div>
+    <div class="step-line" id="stepLine1"></div>
+    <div class="step">
+      <div class="step-circle" id="step2">2</div>
+      <div class="step-label" id="stepLabel2">Payment</div>
+    </div>
+    <div class="step-line" id="stepLine2"></div>
+    <div class="step">
+      <div class="step-circle" id="step3">3</div>
+      <div class="step-label" id="stepLabel3">Done</div>
+    </div>
+  </div>
+
+  <!-- Main area -->
+  <div class="checkout-layout" id="checkoutLayout">
+    <!-- Left Column -->
+    <div>
+      <!-- STEP 1: Shipping Details -->
+      <div id="shippingStep">
+        <div class="checkout-panel" style="margin-bottom:20px">
+          <div class="panel-header">
+            <div class="panel-num">1</div>
+            <div class="panel-title"><i class="fas fa-map-marker-alt"></i> Shipping Details</div>
+          </div>
+          <div class="panel-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">First Name *</label>
+                <input type="text" class="form-control" id="firstName" placeholder="John" autocomplete="given-name"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Last Name *</label>
+                <input type="text" class="form-control" id="lastName" placeholder="Doe" autocomplete="family-name"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Address *</label>
+              <input type="email" class="form-control" id="emailAddr" placeholder="you@example.com" autocomplete="email"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number *</label>
+              <input type="tel" class="form-control" id="phoneNum" placeholder="0712 345 678" autocomplete="tel"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Street Address *</label>
+              <input type="text" class="form-control" id="streetAddr" placeholder="e.g. 123 Kenyatta Avenue" autocomplete="street-address"/>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">City / Town *</label>
+                <input type="text" class="form-control" id="cityField" placeholder="e.g. Nairobi" autocomplete="address-level2"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Postal Code</label>
+                <input type="text" class="form-control" id="postalCode" placeholder="e.g. 00100" autocomplete="postal-code"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Order Notes (optional)</label>
+              <textarea class="form-control" id="orderNotes" rows="2" placeholder="Special instructions for delivery..."></textarea>
+            </div>
+            <div style="background:var(--gray-50);border-radius:var(--radius-sm);padding:12px;margin-top:8px">
+              <p style="font-size:12px;color:var(--gray-500)"><i class="fas fa-truck" style="color:var(--pink)"></i> <strong>Shipping fees:</strong> Nairobi: KES 200 | Major towns: KES 350 | Rest of Kenya: KES 500</p>
+            </div>
+            <button class="btn btn-primary btn-full" style="margin-top:20px" onclick="proceedToPayment()">
+              Continue to Payment <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: Payment -->
+      <div id="paymentStep" style="display:none">
+        <div class="checkout-panel">
+          <div class="panel-header">
+            <div class="panel-num">2</div>
+            <div class="panel-title"><i class="fas fa-credit-card"></i> Payment Method</div>
+          </div>
+          <div class="panel-body">
+            <div class="payment-tabs">
+              <div class="payment-tab active" onclick="selectPayment('mpesa', this)">
+                <div class="payment-icon-lg">📱</div>
+                <div class="payment-name">M-Pesa</div>
+              </div>
+              <div class="payment-tab" onclick="selectPayment('paypal', this)">
+                <div class="payment-icon-lg">🅿️</div>
+                <div class="payment-name">PayPal</div>
+              </div>
+              <div class="payment-tab" onclick="selectPayment('stripe', this)">
+                <div class="payment-icon-lg">💳</div>
+                <div class="payment-name">Card</div>
+              </div>
+              <div class="payment-tab" onclick="selectPayment('cod', this)">
+                <div class="payment-icon-lg">💵</div>
+                <div class="payment-name">Cash</div>
+              </div>
+            </div>
+
+            <!-- M-Pesa -->
+            <div class="payment-panel active" id="panel-mpesa">
+              <div class="mpesa-logo">
+                <div class="mpesa-icon">M-PESA</div>
+                <div>
+                  <div style="font-weight:700;font-size:15px">Pay via M-Pesa</div>
+                  <div style="font-size:12px;color:var(--gray-500)">Powered by Safaricom Daraja API</div>
+                </div>
+              </div>
+              <div class="mpesa-hint">
+                <i class="fas fa-info-circle" style="margin-right:6px"></i>
+                Enter your M-Pesa registered number below. You'll receive a push notification to confirm payment.
+              </div>
+              <div class="form-group">
+                <label class="form-label">M-Pesa Phone Number</label>
+                <input type="tel" class="form-control" id="mpesaPhone" placeholder="0712 345 678" value=""/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Amount (KES)</label>
+                <input type="text" class="form-control" id="mpesaAmount" placeholder="Calculated from cart" readonly/>
+              </div>
+              <button class="btn btn-primary btn-full" onclick="initiateMpesa()" id="mpesaPayBtn">
+                <i class="fas fa-mobile-alt"></i> Send M-Pesa STK Push
+              </button>
+              <div class="mpesa-status" id="mpesaStatus"></div>
+            </div>
+
+            <!-- PayPal -->
+            <div class="payment-panel" id="panel-paypal">
+              <div class="paypal-info">
+                <div style="font-size:40px">🅿️</div>
+                <h3 style="font-size:20px;font-weight:700;margin:12px 0 8px">Pay with PayPal</h3>
+                <p style="font-size:13px;color:var(--gray-500)">You'll be redirected to PayPal to complete your payment securely.</p>
+                <button class="paypal-logo-btn" onclick="initiatePayPal()">
+                  <span style="font-size:22px">🅿️</span> Pay with PayPal
+                </button>
+              </div>
+            </div>
+
+            <!-- Stripe Card -->
+            <div class="payment-panel" id="panel-stripe">
+              <p style="font-size:13px;color:var(--gray-600);margin-bottom:16px">
+                <i class="fas fa-lock" style="color:var(--success)"></i> Secured by Stripe. Your card info is never stored.
+              </p>
+              <div class="form-group">
+                <label class="form-label">Card Details</label>
+                <div class="stripe-element-wrap" id="cardElement">
+                  <!-- Stripe card element injected here -->
+                  <div style="text-align:center;padding:20px;color:var(--gray-400);font-size:13px">
+                    <div class="spinner" style="margin:0 auto 10px;width:24px;height:24px;border-width:2px"></div>
+                    Loading card form...
+                  </div>
+                </div>
+                <div id="cardErrors" style="color:var(--danger);font-size:12px;margin-top:6px"></div>
+              </div>
+              <button class="btn btn-primary btn-full" onclick="initiateStripe()" id="stripePayBtn">
+                <i class="fas fa-lock"></i> Pay Securely
+              </button>
+            </div>
+
+            <!-- Cash on Delivery -->
+            <div class="payment-panel" id="panel-cod">
+              <div style="text-align:center;padding:24px">
+                <div style="font-size:60px;margin-bottom:16px">💵</div>
+                <h3 style="font-size:18px;font-weight:700;margin-bottom:8px">Cash on Delivery</h3>
+                <p style="font-size:13px;color:var(--gray-600);line-height:1.7;margin-bottom:20px">Pay with cash when your order is delivered to your door. Available in Nairobi and major towns.</p>
+                <button class="btn btn-primary btn-full" onclick="placeCodOrder()">
+                  <i class="fas fa-check"></i> Place Order (Pay on Delivery)
+                </button>
+              </div>
+            </div>
+
+            <div class="secure-badge">
+              <i class="fas fa-shield-alt"></i>
+              <span>Your payment information is encrypted and secure. We never store your card details.</span>
+            </div>
+
+            <button class="btn btn-ghost" style="margin-top:12px;width:100%" onclick="goBackToShipping()">
+              <i class="fas fa-arrow-left"></i> Back to Shipping
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: Success -->
+      <div id="successStep" style="display:none">
+        <div class="checkout-panel">
+          <div class="success-screen" style="display:block">
+            <div class="success-icon">🎉</div>
+            <div class="success-title">Order Placed!</div>
+            <p class="success-desc" id="successDesc">Thank you for your order! We'll send a confirmation to your email shortly.</p>
+            <div style="margin-top:28px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+              <a href="/account" class="btn btn-primary"><i class="fas fa-list"></i> View Orders</a>
+              <a href="/" class="btn btn-outline"><i class="fas fa-shopping-bag"></i> Continue Shopping</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Order Summary -->
+    <div>
+      <div class="checkout-panel" style="position:sticky;top:calc(var(--header-height) + 80px)">
+        <div class="panel-header">
+          <div class="panel-num"><i class="fas fa-receipt"></i></div>
+          <div class="panel-title">Order Summary</div>
+        </div>
+        <div class="panel-body">
+          <div class="order-summary" id="orderSummaryItems">
+            <div style="text-align:center;padding:30px;color:var(--gray-400)">
+              <div class="spinner" style="margin:0 auto 10px;width:24px;height:24px;border-width:2px"></div>
+              Loading...
+            </div>
+          </div>
+
+          <!-- Coupon -->
+          <div class="coupon-row">
+            <input type="text" class="coupon-input" id="couponCode" placeholder="Coupon code" maxlength="50"/>
+            <button class="coupon-btn" onclick="applyCoupon()">Apply</button>
+          </div>
+          <div class="coupon-status" id="couponStatus"></div>
+
+          <div class="price-breakdown" id="priceBreakdown">
+            <div class="price-row"><span>Subtotal</span><span id="summarySubtotal">—</span></div>
+            <div class="price-row discount-row" id="discountRow" style="display:none"><span>Discount</span><span id="summaryDiscount">—</span></div>
+            <div class="price-row"><span>Shipping</span><span id="summaryShipping">Calculated next</span></div>
+            <div class="price-row total"><span>Total</span><span id="summaryTotal">—</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let orderId = null;
+let cartTotal = 0;
+let discount = 0;
+let shippingData = null;
+let stripe = null;
+let cardElement = null;
+
+function formatPrice(p) { return 'KES ' + parseFloat(p).toLocaleString('en-KE'); }
+
+// ─── LOAD CART ────────────────────────────────────────────────────────────────
+async function loadCheckoutCart() {
+  const data = await apiGet('/cart/');
+  cartTotal = parseFloat(data.total_price) || 0;
+  document.getElementById('summarySubtotal').textContent = formatPrice(cartTotal);
+  document.getElementById('summaryTotal').textContent = formatPrice(cartTotal);
+  document.getElementById('mpesaAmount').value = cartTotal.toFixed(0);
+
+  if (!data.items.length) {
+    document.getElementById('orderSummaryItems').innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-400)">Your cart is empty. <a href="/" style="color:var(--pink)">Shop now →</a></div>';
+    return;
+  }
+  document.getElementById('orderSummaryItems').innerHTML = data.items.map(item => `
+    <div class="order-item">
+      <img class="order-item-img" src="${item.image || 'https://via.placeholder.com/64'}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/64'"/>
+      <div class="order-item-info">
+        <div class="order-item-name">${item.name}</div>
+        <div class="order-item-qty">Qty: ${item.quantity}</div>
+      </div>
+      <div class="order-item-price">${formatPrice(parseFloat(item.price) * item.quantity)}</div>
+    </div>`).join('');
+
+  // Pre-fill email if logged in
+  const token = localStorage.getItem('auth_token');
+  if (token) {
+    try {
+      const res = await fetch('/api/account/', { headers: { 'Authorization': `Token ${token}` } });
+      const user = await res.json();
+      if (user.email) document.getElementById('emailAddr').value = user.email;
+      if (user.first_name) document.getElementById('firstName').value = user.first_name;
+      if (user.last_name) document.getElementById('lastName').value = user.last_name;
+    } catch(e) {}
+  }
+}
+
+// ─── COUPON ───────────────────────────────────────────────────────────────────
+async function applyCoupon() {
+  const code = document.getElementById('couponCode').value.trim();
+  if (!code) return;
+  const statusEl = document.getElementById('couponStatus');
+  statusEl.textContent = 'Checking...';
+  statusEl.className = 'coupon-status';
+  try {
+    const csrf = getCookie('csrftoken');
+    const res = await fetch('/api/coupons/validate/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrf },
+      body: JSON.stringify({ code, order_amount: cartTotal })
+    });
+    const data = await res.json();
+    if (data.valid) {
+      discount = parseFloat(data.discount_amount);
+      statusEl.textContent = `✓ ${data.description || `${data.discount_type === 'percentage' ? data.discount_value+'%' : 'KES '+data.discount_value} off applied!`}`;
+      statusEl.className = 'coupon-status success';
+      document.getElementById('discountRow').style.display = 'flex';
+      document.getElementById('summaryDiscount').textContent = `-${formatPrice(discount)}`;
+      updateTotal();
+    } else {
+      statusEl.textContent = `✗ ${data.message}`;
+      statusEl.className = 'coupon-status error';
+      discount = 0;
+    }
+  } catch(e) { statusEl.textContent = 'Failed to apply coupon.'; statusEl.className = 'coupon-status error'; }
+}
+
+function updateTotal(shipping = 0) {
+  const total = cartTotal - discount + shipping;
+  document.getElementById('summaryTotal').textContent = formatPrice(total);
+  document.getElementById('mpesaAmount').value = total.toFixed(0);
+}
+
+// ─── SHIPPING FORM ─────────────────────────────────────────────────────────────
+function proceedToPayment() {
+  const fields = [
+    ['firstName', 'First name'],
+    ['lastName', 'Last name'],
+    ['emailAddr', 'Email address'],
+    ['phoneNum', 'Phone number'],
+    ['streetAddr', 'Street address'],
+    ['cityField', 'City'],
+  ];
+  for (const [id, label] of fields) {
+    if (!document.getElementById(id).value.trim()) {
+      showToast(`Please enter your ${label}`, 'error');
+      document.getElementById(id).focus();
+      return;
+    }
+  }
+  document.getElementById('shippingStep').style.display = 'none';
+  document.getElementById('paymentStep').style.display = 'block';
+
+  // Update step indicator
+  document.getElementById('step1').className = 'step-circle done';
+  document.getElementById('step1').innerHTML = '<i class="fas fa-check"></i>';
+  document.getElementById('stepLabel1').className = 'step-label done';
+  document.getElementById('stepLine1').className = 'step-line done';
+  document.getElementById('step2').className = 'step-circle active';
+  document.getElementById('stepLabel2').className = 'step-label active';
+
+  // Calc shipping
+  const city = document.getElementById('cityField').value.toLowerCase();
+  let shippingFee = 500;
+  if (city.includes('nairobi')) shippingFee = 200;
+  else if (['mombasa','kisumu','nakuru','eldoret','thika'].some(c => city.includes(c))) shippingFee = 350;
+  document.getElementById('summaryShipping').textContent = formatPrice(shippingFee);
+  updateTotal(shippingFee);
+
+  // Load Stripe
+  initStripeElement();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goBackToShipping() {
+  document.getElementById('shippingStep').style.display = 'block';
+  document.getElementById('paymentStep').style.display = 'none';
+  document.getElementById('step1').className = 'step-circle active';
+  document.getElementById('step1').innerHTML = '1';
+  document.getElementById('stepLabel1').className = 'step-label active';
+  document.getElementById('stepLine1').className = 'step-line';
+  document.getElementById('step2').className = 'step-circle';
+  document.getElementById('stepLabel2').className = 'step-label';
+}
+
+// ─── CREATE ORDER ─────────────────────────────────────────────────────────────
+async function createOrder(paymentMethod) {
+  const payload = {
+    firstName: document.getElementById('firstName').value.trim(),
+    lastName: document.getElementById('lastName').value.trim(),
+    email: document.getElementById('emailAddr').value.trim(),
+    phone: document.getElementById('phoneNum').value.trim(),
+    address: document.getElementById('streetAddr').value.trim(),
+    postalCode: document.getElementById('postalCode').value.trim() || '00100',
+    city: document.getElementById('cityField').value.trim(),
+    notes: document.getElementById('orderNotes').value.trim(),
+    payment_method: paymentMethod,
+    coupon_code: document.getElementById('couponCode').value.trim()
+  };
+  const csrf = getCookie('csrftoken');
+  const res = await fetch('/api/checkout/shipping/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrf },
+    credentials: 'include',
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json();
+  if (data.success && data.data) {
+    orderId = data.data.order_id;
+    return data.data;
+  }
+  throw new Error(data.message || 'Failed to create order');
+}
+
+// ─── PAYMENT TABS ─────────────────────────────────────────────────────────────
+function selectPayment(method, tabEl) {
+  document.querySelectorAll('.payment-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.payment-panel').forEach(p => p.classList.remove('active'));
+  tabEl.classList.add('active');
+  document.getElementById(`panel-${method}`).classList.add('active');
+}
+
+// ─── MPESA ────────────────────────────────────────────────────────────────────
+async function initiateMpesa() {
+  const phone = document.getElementById('mpesaPhone').value.trim();
+  if (!phone) { showToast('Please enter your M-Pesa phone number', 'error'); return; }
+  const btn = document.getElementById('mpesaPayBtn');
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+  const status = document.getElementById('mpesaStatus');
+  status.className = 'mpesa-status checking'; status.style.display = 'block';
+  status.textContent = 'Creating your order...';
+  try {
+    const orderData = await createOrder('mpesa');
+    status.textContent = 'Sending STK push to your phone...';
+    const csrf = getCookie('csrftoken');
+    const res = await fetch('/api/payment/lipa_na_mpesa/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrf },
+      credentials: 'include',
+      body: JSON.stringify({ phone_number: phone, amount: orderData.total_amount, order_id: orderData.order_id })
+    });
+    const data = await res.json();
+    if (data.checkout_request_id) {
+      status.textContent = '📱 Check your phone! Enter M-Pesa PIN to confirm. Verifying payment...';
+      checkMpesaStatus(orderData.order_id);
+    } else {
+      status.className = 'mpesa-status error';
+      status.textContent = data.detail || 'M-Pesa push failed. Try again.';
+      btn.disabled = false; btn.innerHTML = '<i class="fas fa-mobile-alt"></i> Send M-Pesa STK Push';
+    }
+  } catch(e) {
+    status.className = 'mpesa-status error';
+    status.textContent = 'Error: ' + e.message;
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-mobile-alt"></i> Send M-Pesa STK Push';
+  }
+}
+
+async function checkMpesaStatus(oid, attempts = 0) {
+  if (attempts > 12) {
+    document.getElementById('mpesaStatus').className = 'mpesa-status error';
+    document.getElementById('mpesaStatus').textContent = 'Payment timeout. Please try again or contact support.';
+    document.getElementById('mpesaPayBtn').disabled = false;
+    return;
+  }
+  await new Promise(r => setTimeout(r, 5000));
+  try {
+    const res = await fetch(`/api/payment/status/?order_id=${oid}`, { credentials: 'include' });
+    const data = await res.json();
+    if (data.paid) { showSuccess(oid, 'mpesa', data.mpesa_receipt); return; }
+    checkMpesaStatus(oid, attempts + 1);
+  } catch(e) { checkMpesaStatus(oid, attempts + 1); }
+}
+
+// ─── PAYPAL ───────────────────────────────────────────────────────────────────
+async function initiatePayPal() {
+  try {
+    const orderData = await createOrder('paypal');
+    const csrf = getCookie('csrftoken');
+    const res = await fetch('/api/payment/paypal/create/', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrf },
+      credentials: 'include', body: JSON.stringify({ order_id: orderData.order_id })
+    });
+    const data = await res.json();
+    if (data.approval_url) { window.location.href = data.approval_url; }
+    else { showToast('PayPal error. Try again.', 'error'); }
+  } catch(e) { showToast('Failed: ' + e.message, 'error'); }
+}
+
+// ─── STRIPE ───────────────────────────────────────────────────────────────────
+async function initStripeElement() {
+  try {
+    const res = await fetch('/api/payment/stripe-key/', { credentials: 'include' });
+    const data = await res.json();
+    const pk = data.publishable_key || 'pk_test_placeholder';
+    stripe = Stripe(pk);
+    const elements = stripe.elements();
+    cardElement = elements.create('card', {
+      style: { base: { fontFamily: 'Inter, sans-serif', fontSize: '15px', color: '#111827', '::placeholder': { color: '#9CA3AF' } } }
+    });
+    cardElement.mount('#cardElement');
+    cardElement.on('change', e => {
+      document.getElementById('cardErrors').textContent = e.error ? e.error.message : '';
+    });
+  } catch(e) {
+    document.getElementById('cardElement').innerHTML = '<p style="color:var(--gray-500);font-size:13px;padding:10px">Card payment is not configured. Please use M-Pesa or PayPal.</p>';
+  }
+}
+
+async function initiateStripe() {
+  if (!stripe || !cardElement) { showToast('Card payment not ready', 'error'); return; }
+  const btn = document.getElementById('stripePayBtn');
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+  try {
+    const orderData = await createOrder('stripe');
+    const csrf = getCookie('csrftoken');
+    const res = await fetch('/api/payment/stripe/create/', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrf },
+      credentials: 'include', body: JSON.stringify({ order_id: orderData.order_id })
+    });
+    const data = await res.json();
+    if (data.client_secret) {
+      const { error, paymentIntent } = await stripe.confirmCardPayment(data.client_secret, {
+        payment_method: { card: cardElement, billing_details: { name: `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`, email: document.getElementById('emailAddr').value } }
+      });
+      if (error) { document.getElementById('cardErrors').textContent = error.message; btn.disabled = false; btn.innerHTML = '<i class="fas fa-lock"></i> Pay Securely'; }
+      else if (paymentIntent.status === 'succeeded') { showSuccess(orderData.order_id, 'stripe'); }
+    } else { throw new Error(data.detail || 'Stripe error'); }
+  } catch(e) {
+    showToast('Payment error: ' + e.message, 'error');
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-lock"></i> Pay Securely';
+  }
+}
+
+// ─── CASH ON DELIVERY ─────────────────────────────────────────────────────────
+async function placeCodOrder() {
+  try {
+    const orderData = await createOrder('cod');
+    showSuccess(orderData.order_id, 'cod');
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+// ─── SUCCESS ──────────────────────────────────────────────────────────────────
+function showSuccess(oid, method, receipt = '') {
+  document.getElementById('shippingStep').style.display = 'none';
+  document.getElementById('paymentStep').style.display = 'none';
+  document.getElementById('successStep').style.display = 'block';
+
+  ['step1','step2'].forEach(id => {
+    document.getElementById(id).className = 'step-circle done';
+    document.getElementById(id).innerHTML = '<i class="fas fa-check"></i>';
+  });
+  ['stepLabel1','stepLabel2'].forEach(id => document.getElementById(id).className = 'step-label done');
+  ['stepLine1','stepLine2'].forEach(id => document.getElementById(id).className = 'step-line done');
+  document.getElementById('step3').className = 'step-circle done';
+  document.getElementById('step3').innerHTML = '<i class="fas fa-check"></i>';
+  document.getElementById('stepLabel3').className = 'step-label done';
+
+  const msgs = {
+    mpesa: `Your M-Pesa payment was confirmed! ${receipt ? `Receipt: <strong>${receipt}</strong>` : ''}`,
+    paypal: 'Your PayPal payment was successful!',
+    stripe: 'Your card payment was successful!',
+    cod: 'Order placed! Pay with cash when your order arrives.'
+  };
+  document.getElementById('successDesc').innerHTML = `Order <strong>#${oid}</strong> placed successfully! ${msgs[method] || ''}<br><br>We'll send a confirmation email shortly.`;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.addEventListener('DOMContentLoaded', loadCheckoutCart);
+</script>
+{% endblock %}

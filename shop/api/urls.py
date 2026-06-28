@@ -1,11 +1,14 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import (RegisterView, 
-    CategoryViewSet, ProductViewSet, CartViewSet, OrderViewSet,
+from .views import (
+    RegisterView, CategoryViewSet, ProductViewSet, CartViewSet, OrderViewSet,
     BlogViewSet, SocialMediaViewSet, ProgramViewSet, ProgramCategoryViewSet,
     MessageViewSet, BookingViewSet, ProgramEnrollmentViewSet,
-    CommentViewSet, SessionViewSet, DonationViewSet, PaymentViewSet, CheckoutViewSet, RegisterView, UserAccountViewSet, CommunityViewSet,
-    PasswordResetView, PasswordResetConfirmView
+    CommentViewSet, SessionViewSet, DonationViewSet, PaymentViewSet,
+    CheckoutViewSet, UserAccountViewSet, CommunityViewSet,
+    PasswordResetView, PasswordResetConfirmView,
+    BrandViewSet, TagViewSet, ReviewViewSet, WishlistViewSet,
+    CouponViewSet, ShippingZoneViewSet
 )
 
 app_name = 'shop'
@@ -13,6 +16,12 @@ app_name = 'shop'
 router = DefaultRouter()
 router.register(r'categories', CategoryViewSet, basename='category')
 router.register(r'products', ProductViewSet, basename='product')
+router.register(r'brands', BrandViewSet, basename='brand')
+router.register(r'tags', TagViewSet, basename='tag')
+router.register(r'reviews', ReviewViewSet, basename='review')
+router.register(r'wishlist', WishlistViewSet, basename='wishlist')
+router.register(r'coupons', CouponViewSet, basename='coupon')
+router.register(r'shipping-zones', ShippingZoneViewSet, basename='shipping-zone')
 router.register(r'cart', CartViewSet, basename='cart')
 router.register(r'orders', OrderViewSet, basename='orders')
 router.register(r'blog', BlogViewSet, basename='blog')
