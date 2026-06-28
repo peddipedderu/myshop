@@ -266,20 +266,13 @@ PARLER_LANGUAGES = {
 
 #MEDIA_URL = 'media/'
 #MEDIA_ROOT = BASE_DIR / 'media'
-if DEBUG is True:
-    STATIC_URL = '/static/'
-    STATIC_ROOT = '/static/'
-    STATICFILES_DIRS = [
+STATIC_URL = '/static/'
+STATIC_ROOT = '/var/www/venv/myshop/static_root/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = '/var/www/venv/myshop/media/'
+STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static")
-    ]
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-else:
-    STATIC_URL = '/static/'         
-    STATIC_ROOT = '/var/www/venv/myshop/static/'
-    #MEDIA_URL = '/media/'
-    BASE_DIR / 'media'
-    MEDIA_ROOT = BASE_DIR / 'media'
+]
    # MEDIA_ROOT = Path(BASE_DIR, '/var/www/venv/myshop/media/')
   #  MEDIA_ROOT = os.path.join(BASE_DIR, '/var/www/venv/myshop/media/')
 
