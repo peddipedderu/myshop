@@ -14,4 +14,6 @@ urlpatterns = [
     path('account', views.account_view, name='account_no_slash'),
     path('search/', views.search_view, name='search'),
     path('search', views.search_view, name='search_no_slash'),
+    path('reset_password/', views.reset_password_view, name='reset_password'),
+    path('reset_password', views.reset_password_view, name='reset_password_no_slash'),
 ]

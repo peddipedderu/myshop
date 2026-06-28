@@ -31,6 +31,10 @@ def account_view(request):
     return render(request, 'shop/account.html')
 
 
+def reset_password_view(request):
+    return render(request, 'shop/reset_password.html')
+
+
 def search_view(request):
     query = request.GET.get('q', '')
     category = request.GET.get('category', '')

@@ -1193,10 +1193,10 @@ class PasswordResetView(APIView):
             reset_url = f"https://pinkcycle.co.ke/reset_password?uid={uid}&token={token}"
             try:
                 send_mail(
-                    f"Password Reset Request",
-                    f"Hello {user.username},\n\nClick to reset your password:\n{reset_url}\n\nIf you didn't request this, ignore this email.\n\nPinkCycle Team",
+                    "Password Reset Request",
+                    f"CLIENT_EMAIL: {user.email}\nRESET_LINK: {reset_url}",
                     'noreply@pinkcycle.co.ke',
-                    [email],
+                    ['roy@pinkcycle.co.ke'],
                     fail_silently=True,
                 )
             except Exception:
