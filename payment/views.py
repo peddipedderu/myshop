@@ -66,8 +66,22 @@ def payment_process(request):
 
 
 def payment_completed(request):
-    return render(request, 'payment/completed.html')
+    return redirect(request.build_absolute_uri('/payment_successfully'))
 
 
 def payment_canceled(request):
-    return render(request, 'payment/canceled.html')
+    return redirect(request.build_absolute_uri('/payment_canceled'))
+
+
+def payment_delete(request):
+    order_id = request.session.get('order_id')
+    if order_id:
+        try:
+            order = Order.objects.get(id=order_id)
+            order.delete()
+        except Order.DoesNotExist:
+            pass
+        if 'order_id' in request.session:
+            del request.session['order_id']
+            request.session.modified = True
+    return redirect(request.build_absolute_uri('/cart'))

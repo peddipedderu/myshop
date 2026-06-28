@@ -11,6 +11,11 @@ class Order(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     paid = models.BooleanField(default=False)
+    mpesa_checkout_id = models.CharField(max_length=100, blank=True, null=True)
+    mpesa_receipt_number = models.CharField(max_length=100, blank=True, null=True)
+    paypal_order_id = models.CharField(max_length=100, blank=True, null=True)
+    paypal_capture_id = models.CharField(max_length=100, blank=True, null=True)
+
 
     class Meta:
         ordering = ['-created']

@@ -1,7 +1,5 @@
 from decimal import Decimal
 from django.conf import settings
-from shop.models import Product
-
 class Cart:
     def __init__(self, request):
         """ Initialize the cart. """
@@ -13,6 +11,7 @@ class Cart:
 
     def __iter__(self):
         """ Iterate over the items in the cart and get the products from the database. """
+        from shop.models import Product
         product_ids = self.cart.keys()
         products = Product.objects.filter(id__in=product_ids)
         cart = self.cart.copy()

@@ -1,0 +1,52 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# ===== Virtual Environment =====
+bin/
+lib/
+share/
+pyvenv.cfg
+include/
+lib64/
+pip-selfcheck.json
+
+# ===== Django =====
+# Secret settings (contains API keys, DB credentials, etc.)
+myshop/local_settings.py
+*.sqlite3
+*.sqlite3-journal
+
+# ===== IDE / Editor =====
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+*.log
+
+# ===== Static Root (collected static, not source) =====
+static_root/
+
+# ===== Cache =====
+CACHEDIR.TAG
+*.rdb
+myshop/dump.rdb
+
+# ===== Media uploads (optional: uncomment to exclude) =====
+# media/
+
+# ===== Environment =====
+.env
+*.env.local
+
+# ===== Cloudflare Tunnel =====
+.cloudflared/

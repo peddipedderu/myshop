@@ -57,8 +57,13 @@
       </tr>
     </tbody>
   </table>
-  <form action="{% url "payment:process" %}" method="post">
-    <input type="submit" value="{% translate "Pay now" %}">
-    {% csrf_token %}
-  </form>
+  <div style="margin-top: 20px; display: flex; gap: 15px; align-items: center;">
+    <form action="{% url "payment:process" %}" method="post" style="margin: 0;">
+      <input type="submit" value="{% translate "Pay now" %}">
+      {% csrf_token %}
+    </form>
+    <form action="{% url "payment:delete" %}" method="get" style="margin: 0;">
+      <input type="submit" value="{% translate "Cancel and Delete Order" %}" style="background-color: #fce4ec; color: #c62828; padding: 0.5em 1.5em; border: 1px solid #ffcdd2; border-radius: 4px; font-weight: bold; cursor: pointer;">
+    </form>
+  </div>
 {% endblock %}
