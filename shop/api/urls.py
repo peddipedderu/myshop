@@ -10,8 +10,9 @@ from .views import (
     BrandViewSet, TagViewSet, ReviewViewSet, WishlistViewSet,
     CouponViewSet, ShippingZoneViewSet
 )
+from .download_view import DownloadAppView
 
-app_name = 'shop'
+app_name = 'api'
 
 router = DefaultRouter()
 router.register(r'categories', CategoryViewSet, basename='category')
@@ -40,6 +41,7 @@ router.register(r'checkout', CheckoutViewSet, basename='checkout')
 router.register(r'account', UserAccountViewSet, basename='account')
 
 urlpatterns = [
+    path('api/download-app/', DownloadAppView.as_view(), name='api-download-app'),
     path('api/bookings/Tech/', SessionViewSet.as_view({'get': 'tech'}), name='api-bookings-tech'),
     path('api/bookings/Career/', SessionViewSet.as_view({'get': 'career'}), name='api-bookings-career'),
     path('api/bookings/Wellness/', SessionViewSet.as_view({'get': 'wellness'}), name='api-bookings-wellness'),

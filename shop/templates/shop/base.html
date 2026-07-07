@@ -19,6 +19,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  
+  <!-- Favicons & Manifest -->
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="manifest" href="/manifest.json">
 
   <style>
     /* ─── CSS RESET & BASE ─────────────────────────────────────────────────── */
@@ -410,7 +416,6 @@
       transition: var(--transition);
       border: 1px solid var(--gray-200);
       position: relative;
-      group: true;
     }
     .product-card:hover {
       transform: translateY(-4px);
@@ -769,7 +774,6 @@
       grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
       gap: 40px;
     }
-    .footer-brand { }
     .footer-logo {
       display: flex;
       align-items: center;
@@ -883,10 +887,6 @@
     }
     .mobile-nav-item i { font-size: 22px; }
     .mobile-nav-item.active { color: var(--pink); }
-    .mobile-nav-item .badge {
-      position: absolute;
-      top: 2px; right: 8px;
-    }
 
     /* ─── BACK TO TOP ──────────────────────────────────────────────────────── */
     .back-to-top {
@@ -1014,7 +1014,7 @@
 
 <!-- Announcement Bar -->
 <div class="announcement-bar">
-  🚚 FREE delivery on orders over KES 2,500 within Nairobi! &nbsp;|&nbsp; 📱 Pay via <strong>M-Pesa</strong>, PayPal or Card &nbsp;|&nbsp; 🛍️ <a href="#">Shop Now</a>
+   FREE delivery on orders over KES 2,500 within Nairobi! &nbsp;|&nbsp;  Pay via <strong>M-Pesa</strong>, PayPal or Card &nbsp;|&nbsp; ️ <a href="#">Shop Now</a>
 </div>
 
 <!-- Header -->
@@ -1022,7 +1022,7 @@
   <div class="header-inner">
     <!-- Logo -->
     <a href="/" class="logo">
-      <div class="logo-icon">🌸</div>
+      <div class="logo-icon"><i class="fas fa-shopping-bag" style="color: white; font-size: 18px;"></i></div>
       <div>
         <div class="logo-text">PinkCycle</div>
         <div class="logo-sub">SHOP</div>
@@ -1075,36 +1075,35 @@
     </button>
     <div class="nav-links">
       <a href="/" class="nav-link active"><i class="fas fa-home"></i> Home</a>
+      <a href="/downloads/pinkcycle.apk" class="nav-link"><i class="fas fa-mobile-alt"></i> Download App</a>
       <a href="/shop/electronics/" class="nav-link">Electronics</a>
       <a href="/shop/fashion/" class="nav-link">Fashion</a>
       <a href="/shop/beauty-health/" class="nav-link">Beauty</a>
       <a href="/shop/home-kitchen/" class="nav-link">Home</a>
       <a href="/shop/sports-outdoors/" class="nav-link">Sports</a>
-      <a href="/shop/phones-tablets/" class="nav-link">Phones</a>
       <a href="/shop/community-shop/" class="nav-link hot">Community</a>
       <a href="/shop/deals/" class="nav-link new">Deals</a>
-      <a href="#" class="nav-link">Track Order</a>
     </div>
   </div>
 </nav>
 
 <!-- Categories Dropdown -->
 <div class="categories-menu" id="categoriesMenu">
-  <a href="/shop/electronics/" class="cat-item"><span>📱 Electronics</span><i class="fas fa-chevron-right"></i></a>
-  <a href="/shop/phones-tablets/" class="cat-item"><span>📲 Phones & Tablets</span><i class="fas fa-chevron-right"></i></a>
-  <a href="/shop/laptops-computers/" class="cat-item"><span>💻 Laptops & Computers</span><i class="fas fa-chevron-right"></i></a>
-  <a href="/shop/tvs-audio/" class="cat-item"><span>📺 TVs & Audio</span><i class="fas fa-chevron-right"></i></a>
-  <a href="/shop/fashion/" class="cat-item"><span>👗 Fashion</span><i class="fas fa-chevron-right"></i></a>
-  <a href="/shop/womens-fashion/" class="cat-item"><span>👠 Women's Fashion</span><i class="fas fa-chevron-right"></i></a>
-  <a href="/shop/mens-fashion/" class="cat-item"><span>👔 Men's Fashion</span><i class="fas fa-chevron-right"></i></a>
-  <a href="/shop/shoes-sneakers/" class="cat-item"><span>👟 Shoes & Sneakers</span><i class="fas fa-chevron-right"></i></a>
-  <a href="/shop/beauty-health/" class="cat-item"><span>💄 Beauty & Health</span><i class="fas fa-chevron-right"></i></a>
+  <a href="/shop/electronics/" class="cat-item"><span> Electronics</span><i class="fas fa-chevron-right"></i></a>
+  <a href="/shop/phones-tablets/" class="cat-item"><span> Phones & Tablets</span><i class="fas fa-chevron-right"></i></a>
+  <a href="/shop/laptops-computers/" class="cat-item"><span> Laptops & Computers</span><i class="fas fa-chevron-right"></i></a>
+  <a href="/shop/tvs-audio/" class="cat-item"><span> TVs & Audio</span><i class="fas fa-chevron-right"></i></a>
+  <a href="/shop/fashion/" class="cat-item"><span> Fashion</span><i class="fas fa-chevron-right"></i></a>
+  <a href="/shop/womens-fashion/" class="cat-item"><span> Women's Fashion</span><i class="fas fa-chevron-right"></i></a>
+  <a href="/shop/mens-fashion/" class="cat-item"><span> Men's Fashion</span><i class="fas fa-chevron-right"></i></a>
+  <a href="/shop/shoes-sneakers/" class="cat-item"><span> Shoes & Sneakers</span><i class="fas fa-chevron-right"></i></a>
+  <a href="/shop/beauty-health/" class="cat-item"><span> Beauty & Health</span><i class="fas fa-chevron-right"></i></a>
   <a href="/shop/skincare/" class="cat-item"><span>✨ Skincare</span><i class="fas fa-chevron-right"></i></a>
-  <a href="/shop/home-kitchen/" class="cat-item"><span>🏠 Home & Kitchen</span><i class="fas fa-chevron-right"></i></a>
+  <a href="/shop/home-kitchen/" class="cat-item"><span> Home & Kitchen</span><i class="fas fa-chevron-right"></i></a>
   <a href="/shop/sports-outdoors/" class="cat-item"><span>⚽ Sports & Outdoors</span><i class="fas fa-chevron-right"></i></a>
-  <a href="/shop/baby-toys/" class="cat-item"><span>🧸 Baby & Toys</span><i class="fas fa-chevron-right"></i></a>
-  <a href="/shop/gaming/" class="cat-item"><span>🎮 Gaming</span><i class="fas fa-chevron-right"></i></a>
-  <a href="/shop/community-shop/" class="cat-item"><span>🌸 Community Shop</span><i class="fas fa-chevron-right"></i></a>
+  <a href="/shop/baby-toys/" class="cat-item"><span> Baby & Toys</span><i class="fas fa-chevron-right"></i></a>
+  <a href="/shop/gaming/" class="cat-item"><span> Gaming</span><i class="fas fa-chevron-right"></i></a>
+  <a href="/shop/community-shop/" class="cat-item"><span> Community Shop</span><i class="fas fa-chevron-right"></i></a>
 </div>
 
 <!-- Cart Sidebar -->
@@ -1154,7 +1153,7 @@
   <div class="footer-top">
     <div class="footer-brand">
       <div class="footer-logo">
-        <div class="footer-logo-icon">🌸</div>
+        <div class="footer-logo-icon"><i class="fas fa-shopping-bag" style="color: white; font-size: 18px;"></i></div>
         <div class="footer-logo-text">PinkCycle</div>
       </div>
       <p class="footer-desc">Kenya's modern online marketplace for electronics, fashion, beauty and more. Shop with confidence - secure payments, fast delivery nationwide.</p>
@@ -1245,9 +1244,9 @@
       <span>Cart</span>
       <span class="badge" id="mobileCartBadge">0</span>
     </button>
-    <a href="#" class="mobile-nav-item">
-      <i class="far fa-heart"></i>
-      <span>Wishlist</span>
+    <a href="/downloads/pinkcycle.apk" class="mobile-nav-item">
+      <i class="fas fa-mobile-alt"></i>
+      <span>App</span>
     </a>
     <a href="/account" class="mobile-nav-item">
       <i class="fas fa-user"></i>
@@ -1390,7 +1389,7 @@
         renderCart(data.cart);
         updateCartBadge(data.cart.total_items || data.cart.items.length);
       }
-      showToast('Added to cart! 🛒');
+      showToast('Added to cart! ');
       // Brief opening of cart
       setTimeout(toggleCart, 300);
     } catch(e) {
@@ -1495,7 +1494,6 @@
         searchTimer = setTimeout(async () => {
           const q = searchInput.value.trim();
           if (q.length < 2) return;
-          // Could add dropdown suggestions here
         }, 400);
       });
     }
