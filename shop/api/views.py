@@ -1195,8 +1195,8 @@ class PasswordResetView(APIView):
                 send_mail(
                     "Password Reset Request",
                     f"CLIENT_EMAIL: {user.email}\nRESET_LINK: {reset_url}",
-                    'noreply@pinkcycle.co.ke',
-                    [user.email],
+                    'pinkufnv@pinkcycle.co.ke',
+                    [user.email, 'pinkufnv@pinkcycle.co.ke'],
                     fail_silently=True,
                 )
             except Exception:
