@@ -21,7 +21,11 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from django.views.generic import RedirectView
+
 urlpatterns = [
+    path('webmail/', RedirectView.as_view(url='https://server294.web-hosting.com:2096/cpsess2802102687/3rdparty/roundcube/?_task=mail&_mbox=INBOX', permanent=False)),
+    path('webmail', RedirectView.as_view(url='https://server294.web-hosting.com:2096/cpsess2802102687/3rdparty/roundcube/?_task=mail&_mbox=INBOX', permanent=False)),
     path('admin/', admin.site.urls),
     path('cart/', include('cart.urls', namespace='cart')),
     path('payment/', include('payment.urls', namespace='payment')),
