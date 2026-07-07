@@ -1191,16 +1191,13 @@ class PasswordResetView(APIView):
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = default_token_generator.make_token(user)
             reset_url = f"https://pinkcycle.co.ke/reset_password?uid={uid}&token={token}"
-            try:
-                send_mail(
-                    "Password Reset Request",
-                    f"CLIENT_EMAIL: {user.email}\nRESET_LINK: {reset_url}",
-                    'pinkufnv@pinkcycle.co.ke',
-                    [user.email, 'pinkufnv@pinkcycle.co.ke'],
-                    fail_silently=True,
-                )
-            except Exception:
-                pass
+            send_mail(
+                "Password Reset Request",
+                f"CLIENT_EMAIL: {user.email}\nRESET_LINK: {reset_url}",
+                'pinkufnv@pinkcycle.co.ke',
+                [user.email, 'pinkufnv@pinkcycle.co.ke'],
+                fail_silently=False,
+            )
         return Response({"detail": "If the email is registered, a password reset link has been sent."}, status=200)
 
 
