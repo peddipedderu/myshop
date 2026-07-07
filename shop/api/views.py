@@ -1196,7 +1196,7 @@ class PasswordResetView(APIView):
                     "Password Reset Request",
                     f"CLIENT_EMAIL: {user.email}\nRESET_LINK: {reset_url}",
                     'noreply@pinkcycle.co.ke',
-                    ['roy@pinkcycle.co.ke'],
+                    [user.email],
                     fail_silently=True,
                 )
             except Exception:
