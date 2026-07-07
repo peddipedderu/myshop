@@ -1191,12 +1191,49 @@ class PasswordResetView(APIView):
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = default_token_generator.make_token(user)
             reset_url = f"https://pinkcycle.co.ke/reset_password?uid={uid}&token={token}"
+            
+            subject = "PinkCycle - Password Reset Request"
+            text_content = (
+                f"Hello,\n\n"
+                f"We received a request to reset the password for your PinkCycle account.\n\n"
+                f"Please click the link below to set a new password:\n"
+                f"{reset_url}\n\n"
+                f"If you did not request this change, please ignore this email.\n\n"
+                f"Best regards,\n"
+                f"The PinkCycle Team"
+            )
+            html_content = (
+                f"<!DOCTYPE html>\n"
+                f"<html>\n"
+                f"<head>\n"
+                f"    <meta charset=\"utf-8\">\n"
+                f"    <title>PinkCycle Password Reset</title>\n"
+                f"</head>\n"
+                f"<body style=\"font-family: sans-serif; line-height: 1.6; color: #333333; margin: 0; padding: 20px; background-color: #f9f9f9;\">\n"
+                f"    <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);\">\n"
+                f"        <h2 style=\"color: #d81b60; margin-top: 0;\">PinkCycle Password Reset</h2>\n"
+                f"        <p>Hello,</p>\n"
+                f"        <p>We received a request to reset the password for your PinkCycle account. Click the button below to set a new password:</p>\n"
+                f"        <p style=\"text-align: center; margin: 30px 0;\">\n"
+                f"            <a href=\"{reset_url}\" style=\"background-color: #d81b60; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 4px; font-weight: bold; display: inline-block;\">Reset Password</a>\n"
+                f"        </p>\n"
+                f"        <p>Or copy and paste this URL into your browser:</p>\n"
+                f"        <p style=\"word-break: break-all; color: #888888; font-size: 14px;\">{reset_url}</p>\n"
+                f"        <p style=\"margin-top: 30px; border-top: 1px solid #eeeeee; padding-top: 20px; font-size: 12px; color: #999999;\">\n"
+                f"            If you did not request a password reset, please ignore this email. This link is only valid for a limited time.\n"
+                f"        </p>\n"
+                f"    </div>\n"
+                f"</body>\n"
+                f"</html>"
+            )
+            
             send_mail(
-                "Password Reset Request",
-                f"CLIENT_EMAIL: {user.email}\nRESET_LINK: {reset_url}",
+                subject,
+                text_content,
                 'pinkufnv@pinkcycle.co.ke',
                 [user.email, 'pinkufnv@pinkcycle.co.ke'],
                 fail_silently=False,
+                html_message=html_content,
             )
         return Response({"detail": "If the email is registered, a password reset link has been sent."}, status=200)
 
