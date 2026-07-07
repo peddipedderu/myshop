@@ -1230,8 +1230,8 @@ class PasswordResetView(APIView):
             send_mail(
                 subject,
                 text_content,
-                'pinkufnv@pinkcycle.co.ke',
-                [user.email, 'pinkufnv@pinkcycle.co.ke'],
+                'info@pinkcycle.co.ke',
+                [user.email, 'info@pinkcycle.co.ke'],
                 fail_silently=False,
                 html_message=html_content,
             )
