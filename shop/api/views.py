@@ -1055,6 +1055,7 @@ class BookingViewSet(viewsets.ModelViewSet):
 
 # ─────────────────────────── AUTH ─────────────────────────────────────────────
 class RegisterView(APIView):
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -1180,6 +1181,7 @@ from django.core.mail import send_mail
 
 
 class PasswordResetView(APIView):
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -1239,6 +1241,7 @@ class PasswordResetView(APIView):
 
 
 class PasswordResetConfirmView(APIView):
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def post(self, request):
